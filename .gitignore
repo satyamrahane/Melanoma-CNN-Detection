@@ -1,0 +1,30 @@
+# Model files (too large for GitHub)
+models/*.pth
+models/*.pt
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Data (too large for GitHub)
+data/
+
+# Outputs (generated files)
+outputs/graphs/
+outputs/*.json
+
+# Virtual environment
+venv/
+env/
+.env
+
+# IDE
+.vscode/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db

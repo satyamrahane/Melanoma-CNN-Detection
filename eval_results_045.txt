@@ -1,0 +1,61 @@
+﻿============================================================
+  MelanomaAI - Full Model Evaluation Results
+  Threshold: 0.45
+============================================================
+
+  Model:         models\melanoma_final.pth
+  Evaluated:     2026-03-09T21:58:32.586807
+  Total Samples: 1564
+
+  --- CORE METRICS ---
+  Accuracy:      86.25%
+  AUC-ROC:       0.9405
+  Sensitivity:   85.78%
+  Specificity:   86.33%
+  F1-Score:      0.6350
+  Precision:     50.40%
+  Avg Precision: 0.7764
+
+  --- CONFUSION MATRIX ---
+  TN=1162  FP=184
+  FN=31  TP=187
+
+  --- RISK STRATIFICATION ---
+  CRITICAL:  50
+  HIGH:      126
+  MODERATE:  239
+  LOW:       1149
+  Mean Score:  22.92
+  FP Caught:   195 (52.6%)
+
+  --- FAIRNESS METRICS ---
+  Light Skin N:    1011
+  Dark Skin N:     553
+  Light Mean Prob: 0.2167
+  Dark Mean Prob:  0.3983
+  Probability Gap: 0.1816
+
+  --- THRESHOLD ANALYSIS ---
+  t=0.20 | Acc=59.78% | Sens=98.62% | Spec=53.49% | F1=0.4060
+  t=0.25 | Acc=63.11% | Sens=98.17% | Spec=57.43% | F1=0.4259
+  t=0.30 | Acc=68.29% | Sens=97.71% | Spec=63.52% | F1=0.4620
+  t=0.35 | Acc=73.66% | Sens=95.41% | Spec=70.13% | F1=0.5024
+  t=0.40 | Acc=80.63% | Sens=93.58% | Spec=78.53% | F1=0.5738
+  t=0.45 | Acc=86.25% | Sens=85.78% | Spec=86.33% | F1=0.6350 <-- SELECTED
+  t=0.50 | Acc=89.26% | Sens=76.61% | Spec=91.31% | F1=0.6653
+  t=0.55 | Acc=90.73% | Sens=64.68% | Spec=94.95% | F1=0.6604
+  t=0.60 | Acc=92.07% | Sens=59.17% | Spec=97.40% | F1=0.6754
+  t=0.65 | Acc=91.56% | Sens=48.62% | Spec=98.51% | F1=0.6163
+  t=0.70 | Acc=90.98% | Sens=39.45% | Spec=99.33% | F1=0.5495
+
+  --- GRAPHS GENERATED ---
+    outputs/graphs/confusion_matrix.png (33.9 KB)
+    outputs/graphs/fairness_analysis.png (64.6 KB)
+    outputs/graphs/metrics_radar.png (114.2 KB)
+    outputs/graphs/precision_recall.png (39.3 KB)
+    outputs/graphs/probability_histogram.png (35.0 KB)
+    outputs/graphs/risk_distribution.png (177.9 KB)
+    outputs/graphs/roc_curve.png (38.5 KB)
+    outputs/graphs/threshold_analysis.png (146.5 KB)
+
+============================================================
