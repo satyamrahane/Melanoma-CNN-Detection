@@ -1,3 +1,5 @@
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 import os, json, cv2, time
 import numpy as np
 import torch
@@ -38,7 +40,7 @@ BATCH_SIZE = 16
 EPOCHS_P1  = 20
 EPOCHS_P2  = 50
 LR_P1      = 1e-4
-LR_P2      = 5e-6
+LR_P2      = 1e-5
 DATA_DIR   = "data/processed"
 
 train_transform = A.Compose([
@@ -114,7 +116,7 @@ class SkinDataset(torch.utils.data.Dataset):
             img = self.transform(image=img)["image"]
         return img, label
 
-print("\n📂 Loading data...")
+print("\n[DATA] Loading data...")
 base_ds = ImageFolder(DATA_DIR)
 class_names = base_ds.classes
 n = len(base_ds)
@@ -141,7 +143,7 @@ train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, sampler=sampler,
 val_loader   = DataLoader(val_ds,   batch_size=BATCH_SIZE, shuffle=False,
                           num_workers=0, pin_memory=True)
 
-print("\n🏗️ Building EfficientNet-B3...")
+print("\n[MODEL] Building EfficientNet-B3...")
 base_model = models.efficientnet_b3(weights=models.EfficientNet_B3_Weights.IMAGENET1K_V1)
 num_features = base_model.classifier[1].in_features
 base_model.classifier = nn.Sequential(
@@ -160,7 +162,7 @@ model = base_model.to(device)
 print(f"   Parameters: {sum(p.numel() for p in model.parameters()):,}")
 
 class FocalLoss(nn.Module):
-    def __init__(self, gamma=3.0, alpha=0.55):
+    def __init__(self, gamma=2.0, alpha=0.35):
         super().__init__()
         self.gamma = gamma
         self.alpha = alpha
@@ -333,7 +335,7 @@ def train_phase(model, loader, val_loader, optimizer, scheduler,
     return history, best_auc
 
 # PHASE 1
-print("\n🔒 Phase 1: Freezing base, training head only...")
+print("\n[PHASE 1] Freezing base, training head only...")
 for param in model.features.parameters():
     param.requires_grad = False
 print(f"   Trainable: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}")
@@ -344,7 +346,7 @@ scheduler1 = torch.optim.lr_scheduler.ReduceLROnPlateau(
 h1, p1_auc = train_phase(model, train_loader, val_loader, optimizer1, scheduler1,
                           EPOCHS_P1, "PHASE 1 — Head Training", "models/best_phase1.pth", patience=5)
 
-print("\n📊 Phase 1 Evaluation...")
+print("\n[EVAL] Phase 1 Evaluation...")
 acc1,auc1,yt1,yp1,ypred1 = evaluate(model, val_loader)
 r1 = classification_report(yt1, ypred1, target_names=class_names, output_dict=True)
 print(f"   Accuracy:{acc1*100:.2f}%  AUC:{auc1:.4f}")
@@ -354,7 +356,7 @@ with open("outputs/metrics_phase1.json","w") as f:
 print("   ✅ Saved outputs/metrics_phase1.json")
 
 # PHASE 2
-print("\n🔓 Phase 2: Unfreezing top 30% of EfficientNet-B3...")
+print("\n[PHASE 2] Unfreezing top 30% of EfficientNet-B3...")
 layer_list = list(model.features.children())
 cutoff = int(len(layer_list) * 0.7)
 for i, layer in enumerate(layer_list):
@@ -366,10 +368,10 @@ optimizer2 = torch.optim.Adam(
 scheduler2 = torch.optim.lr_scheduler.CosineAnnealingLR(
     optimizer2, T_max=EPOCHS_P2, eta_min=1e-8)
 h2, p2_auc = train_phase(model, train_loader, val_loader, optimizer2, scheduler2,
-                          EPOCHS_P2, "PHASE 2 — Fine-tuning top 30%", "models/melanoma_final.pth", patience=15)
+                          EPOCHS_P2, "PHASE 2 — Fine-tuning top 30%", "models/melanoma_final.pth", patience=10)
 
 # FINAL EVAL
-print("\n📊 Final Evaluation...")
+print("\n[EVAL] Final Evaluation...")
 acc,auc,y_true,y_prob,y_pred = evaluate(model, val_loader)
 report = classification_report(y_true, y_pred, target_names=class_names, output_dict=True)
 cm = confusion_matrix(y_true, y_pred)
@@ -401,7 +403,7 @@ with open("outputs/metrics.json","w") as f:
 print("✅ Saved outputs/metrics.json")
 
 # PLOTS
-print("\n📈 Generating plots...")
+print("\n[PLOT] Generating plots...")
 combined_loss = h1["train_loss"] + h2["train_loss"]
 combined_acc  = h1["val_acc"]   + h2["val_acc"]
 combined_auc  = h1["val_auc"]   + h2["val_auc"]
@@ -448,7 +450,7 @@ plt.close()
 print("✅ All plots saved")
 
 # ROBUSTNESS
-print("\n🛡️ Robustness testing by skin tone (using Integrated Robustness Layer)...")
+print("\n[TEST] Robustness testing by skin tone (using Integrated Robustness Layer)...")
 # Note: Functions now imported from risk_engine at top of file
 
 model.eval()
@@ -489,8 +491,8 @@ with open("outputs/robustness_report.json","w") as f:
                "light_skin":lm,"dark_skin":dm,"fairness_gap":float(gap)},f,indent=2)
 print("✅ Saved outputs/robustness_report.json")
 
-print(f"\n{'='*60}")
-print("  🎉 EVERYTHING DONE")
+print("\n" + "="*60)
+print("  [DONE] EVERYTHING COMPLETED")
 print(f"  Accuracy:    {acc*100:.2f}%")
 print(f"  AUC-ROC:     {auc:.4f}")
 print(f"  Sensitivity: {sens*100:.2f}%")

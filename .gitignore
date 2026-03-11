@@ -1,6 +1,8 @@
 # Model files (too large for GitHub)
 models/*.pth
 models/*.pt
+models/*.h5
+models/*.keras
 
 # Python cache
 __pycache__/

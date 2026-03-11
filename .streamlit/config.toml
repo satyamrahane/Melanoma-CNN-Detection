@@ -1,15 +1,9 @@
-[theme]
-# Primary accent color for interactive elements
-primaryColor = "#2563EB"
+[browser]
+gatherUsageStats = false
 
-# Background color for the main content area
-backgroundColor = "#FFFFFF"
+[server]
+headless = true
+enableStaticServing = false
 
-# Background color used for the sidebar and most interactive widgets
-secondaryBackgroundColor = "#F8FAFC"
-
-# Color used for almost all text
-textColor = "#0F172A"
-
-# Font family for all text in the app
-font = "sans serif"
+[ui]
+hideTopBar = true
