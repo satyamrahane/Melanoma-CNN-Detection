@@ -137,7 +137,7 @@ def main():
     
     # Header
     print("="*60)
-    print(" " * 15 + "🔬 MELANOMA AI DIAGNOSTIC REPORT")
+    print(" " * 15 + "MELANOMA AI DIAGNOSTIC REPORT")
     print("="*60)
     
     # Core Verdict
