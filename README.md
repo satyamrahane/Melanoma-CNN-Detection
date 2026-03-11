@@ -1,171 +1,53 @@
-# Melanoma Skin Cancer Detection with Robustness Testing 🩺
+# MelanomaAI — Skin Cancer Detection System
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange.svg)
-![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B.svg)
-![Medical AI](https://img.shields.io/badge/Medical-AI-green.svg)
+## Final Results
+| Metric | Value |
+|--------|-------|
+| Accuracy | 88.94% |
+| AUC-ROC | 0.9392 |
+| Sensitivity | 82.57% |
+| Specificity | 89.97% |
+| F1 Score | 0.6754 |
+| FP Caught | 55.1% |
+| Fairness Gap | 0.1834 |
 
-A professional Deep Learning system designed for the early detection of Melanoma from dermoscopic images.  
-This project implements a custom CNN architecture with a specialized **Robustness Layer** to ensure reliable diagnostic performance across diverse skin tones and imbalanced datasets.
+## Model
+- Architecture: EfficientNetB3
+- Dataset: HAM10000 (7,818 images)
+- Training: Two-phase focal loss
+- Threshold: 0.50
 
----
+## Novel Contribution
+Inference-time skin tone detection using ITA estimation.
+Dark skin images routed through CLAHE preprocessing.
+Fairness gap measured and flagged for clinical review.
+Risk stratification reduces false positive escalations by 55.1%.
 
-## 📌 Project Overview
+## How to Run
 
-Melanoma is the most aggressive form of skin cancer, yet it has a **99% survival rate if detected early**.  
-This project provides an AI-driven screening tool that assists in the classification of skin lesions as:
+### Terminal Demo
+python demo.py path/to/image.jpg
 
-- **Benign**
-- **Malignant**
+### Full Evaluation
+python evaluate_model.py --threshold 0.50
 
-### Key Technical Challenges Addressed
+### Training
+python auto_train.py
 
-- **Class Imbalance** → Handled using **Focal Loss**
-- **Skin Tone Bias** → Adaptive preprocessing via **CLAHE + ITA estimation**
-- **Clinical Sensitivity** → Adjustable threshold to maximize **Recall (Sensitivity)**
+### Web Interface
+streamlit run app.py --server.port 8502
 
----
+## Requirements
+pip install -r requirements.txt
 
-## ✨ Key Features
-
-- ✅ **Custom CNN Architecture** (4 convolution blocks)
-- ✅ **Robustness Layer** (Skin-tone aware preprocessing)
-- ✅ **Focal Loss Implementation** for malignant focus
-- ✅ **Pigmentation-Aware Pipeline** (ITA-based classification)
-- ✅ **Interactive Streamlit UI**
-- ✅ **ROC-AUC & Confusion Matrix Evaluation**
-- ✅ Adjustable Clinical Threshold for higher melanoma recall
-
----
-
-## 🏗️ Model Architecture
-
-Built using TensorFlow/Keras with a sequential pipeline:
-
-| Layer | Configuration |
-|------|---------------|
-| Input | 224 × 224 × 3 RGB |
-| Augmentation | Flip, Rotation, Zoom, Contrast |
-| Conv Block 1 | Conv2D (32) + BN + ReLU + MaxPool |
-| Conv Block 2 | Conv2D (64) + BN + ReLU + MaxPool |
-| Conv Block 3 | Conv2D (128) + BN + ReLU + MaxPool |
-| Conv Block 4 | Conv2D (256) + BN + ReLU + MaxPool |
-| Pooling | GlobalAveragePooling2D |
-| Dense | 128 + Dropout(0.5) |
-| Output | Sigmoid (Binary Classification) |
-
----
-
-## 📈 Performance Results
-
-Validated on dermoscopic datasets:
-
-- **Accuracy**: ~80%
-- **ROC-AUC**: **0.90**
-- **Recall (Sensitivity)**: **Up to 97.3%** (at threshold 0.35)
-- **Precision**: Balanced using Focal Loss
-
-Clinical focus: Prioritizing **malignant detection sensitivity**.
-
----
-
-## 🛠️ Technologies Used
-
-- **Deep Learning** → TensorFlow, Keras
-- **Computer Vision** → OpenCV, PIL
-- **Data Science** → NumPy, Pandas, Scikit-learn
-- **Visualization** → Matplotlib, Seaborn
-- **Frontend Interface** → Streamlit
-
----
-
-## 📂 Folder Structure
-
-```
-.
-├── app.py                  # Streamlit web application
-├── train.py                # Training pipeline & Focal Loss
-├── robustness_layer.py     # Pigmentation-aware preprocessing
-├── skin_tone_utils.py      # ITA calculation & skin categorization
-├── evaluate_final.py       # Model evaluation & metrics
-├── models/                 # Saved model files (.keras)
-├── data/                   # Dataset directory (benign/malignant)
-└── outputs/                # Evaluation results & confusion matrices
-```
-
----
-
-## 🚀 Getting Started
-
-### 1️⃣ Clone the Repository
-
-```bash
-git clone https://github.com/satyamrahane/Melanoma-CNN-Detection.git
-cd Melanoma-CNN-Detection
-```
-
----
-
-### 2️⃣ Install Dependencies
-
-```bash
-pip install tensorflow streamlit opencv-python numpy pillow scikit-learn matplotlib seaborn
-```
-
----
-
-### 3️⃣ Train the Model
-
-```bash
-python train.py
-```
-
-> Ensure dataset is structured as:
-> `data/processed/benign`
-> `data/processed/malignant`
-
----
-
-### 4️⃣ Run the Web Interface
-
-```bash
-streamlit run app.py
-```
-
-The system will open in your browser for real-time melanoma prediction.
-
----
-
-## 🧠 Robustness Layer Overview
-
-The robustness module:
-
-1. Estimates skin tone using **Individual Typology Angle (ITA)**
-2. Classifies pigmentation into 6 categories
-3. Applies CLAHE enhancement automatically for darker skin tones
-4. Sends enhanced image to CNN for prediction
-
-This reduces dataset bias and improves fairness.
-
----
-
-## 📋 Medical Disclaimer
-
-**IMPORTANT:**
-This software is an academic research project and is **NOT** a certified medical device.
-
-It should be used for demonstration and educational purposes only.
-The predictions generated by this model are not a substitute for professional medical diagnosis.
-
-Always consult a licensed dermatologist for medical evaluation.
-
----
-
-## 👨‍💻 Author
-
-Developed by **Satyam Rahane**
-Academic Project – Computer Engineering (AI/ML Domain)
-
----
-
-*Built for academic submission, research exploration, and portfolio showcase.*
+## Project Structure
+EDI/
+├── app.py                  # Streamlit web interface
+├── auto_train.py           # Training pipeline
+├── evaluate_model.py       # Evaluation + graphs
+├── demo.py                 # Terminal demo
+├── risk_engine.py          # Risk scoring + robustness
+├── frontend/               # UI components
+├── backend/                # Model + metrics helpers
+├── models/                 # Trained weights
+└── outputs/                # Graphs + metrics JSON

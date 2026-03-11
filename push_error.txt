@@ -1,0 +1,67 @@
+﻿git : remote: 
+error: Trace: a8be9
+b35b0fbd8e2d9f92896
+ca8390ebb7e079b887a
+cd335ddc43493773780
+51        
+At line:1 char:1
++ git push origin 
+main --force 2>&1 
+| Out-File 
+-FilePath 
+push_error.txt ...
++ ~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
+    + CategoryInfo 
+             : No  
+  tSpecified: (r   
+ emote: error:     
+...7378051         
+   :String) [    
+], RemoteExcep    
+tion
+    + FullyQualifi 
+   edErrorId : Na  
+  tiveCommandErr   
+ or
+ 
+remote: error: See 
+https://gh.io/lfs 
+for more 
+information.       
+ 
+remote: error: 
+File models/melanom
+a_model.h5 is 
+127.86 MB; this 
+exceeds GitHub's 
+file size limit of 
+100.00 MB        
+remote: error: 
+File models/melanom
+a_model.keras is 
+127.86 MB; this 
+exceeds GitHub's 
+file size limit of 
+100.00 MB        
+remote: error: 
+GH001: Large files 
+detected. You may 
+want to try Git 
+Large File Storage 
+- https://git-lfs.g
+ithub.com.        
+To https://github.c
+om/satyamrahane/Mel
+anoma-CNN-Detection
+.git
+ ! [remote 
+rejected] main -> 
+main (pre-receive 
+hook declined)
+error: failed to 
+push some refs to '
+https://github.com/
+satyamrahane/Melano
+ma-CNN-Detection.gi
+t'

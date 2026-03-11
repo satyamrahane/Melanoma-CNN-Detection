@@ -1,0 +1,35 @@
+﻿
+[1/3] Loading MelanomaAI Model...
+[2/3] Analyzing Skin Tone & Running Prediction...
+[3/3] Generating Results...
+
+============================================================
+               MELANOMA AI DIAGNOSTIC REPORT
+============================================================
+VERDICT:      [91mMALIGNANT (Cancerous ù Seek immediate medical attention)[0m
+Probability:  78.0%
+Risk Level:   CRITICAL
+Risk Score:   77/100
+------------------------------------------------------------
+Skin Tone:    73.7░ (Very Light)
+CLAHE:        OFF
+
+ABCD BIO-MARKER ESTIMATION:
+ - Asymmetry: 0.744 [High]
+ - Border:    0.763 [Irregular]
+ - Color:     0.584 [Multiple colors]
+ - Diameter:  11.4mm [Large (>6mm)]
+------------------------------------------------------------
+EXPLAINABILITY (Grad-CAM)
+------------------------------------------------------------
+Heatmap:      SAVED -> data/processed/malignant/ISIC_0024929_gradcam.jpg
+              Shows regions model focused on for diagnosis.
+------------------------------------------------------------
+SYSTEM PERFORMANCE (GLOBAL METRICS)
+------------------------------------------------------------
+Accuracy:     88.94%
+AUC:          0.9392
+Sensitivity:  82.57%
+Specificity:  89.97%
+============================================================
+

@@ -5,8 +5,14 @@ from PIL import Image
 from datetime import datetime
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from backend.model import predict
+from backend.model import predict, build_model, val_tf
 from backend.pdf_report import generate_report
+
+try:
+    from backend.gradcam import GradCAM, generate_heatmap_overlay
+    HAS_GRADCAM = True
+except ImportError:
+    HAS_GRADCAM = False
 
 def render_diagnosis(model, threshold, metrics):
     c_left, c_right = st.columns([1, 1], gap="large")
@@ -67,6 +73,28 @@ def render_diagnosis(model, threshold, metrics):
             unsafe_allow_html=True)
             st.image(img_arr, use_container_width=True)
             st.markdown('</div></div>', unsafe_allow_html=True)
+
+            # Grad-CAM Heatmap
+            if HAS_GRADCAM and model is not None:
+                try:
+                    import torch
+                    device = next(model.parameters()).device
+                    img_resized = __import__('cv2').resize(img_arr, (224, 224))
+                    t = val_tf(image=img_resized)["image"].unsqueeze(0).to(device)
+                    cam_gen = GradCAM(model)
+                    cam = cam_gen.generate(t)
+                    overlay = generate_heatmap_overlay(img_arr, cam)
+                    st.markdown(
+                    '<div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm mt-4">'
+                        '<div class="p-4 border-b border-slate-100">'
+                            '<span class="text-xs font-bold text-slate-500 uppercase">🧠 Grad-CAM Explainability Heatmap</span>'
+                        '</div>'
+                        '<div class="aspect-video bg-slate-100">',
+                    unsafe_allow_html=True)
+                    st.image(overlay, use_container_width=True, caption="Red = high attention | Blue = low attention")
+                    st.markdown('</div></div>', unsafe_allow_html=True)
+                except Exception:
+                    pass
 
     with c_right:
         result = None

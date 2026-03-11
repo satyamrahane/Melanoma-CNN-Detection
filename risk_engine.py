@@ -11,9 +11,9 @@ TONE_TABLE = [
     (55,  "Very Light",   "#F5CBA7", 15, 0.95),
     (41,  "Light",        "#E59866", 13, 0.90),
     (28,  "Intermediate", "#CA8A5A", 10, 0.82),
-    (10,  "Tan",          "#A0522D",  8, 0.74),
-    (-30, "Brown",        "#6B3A2A",  6, 0.65),
-    (-99, "Dark",         "#3D1C0E",  4, 0.55),
+    (10,  "Tan",          "#A0522D",  6, 0.74),
+    (-30, "Brown",        "#6B3A2A",  3, 0.65),
+    (-99, "Dark",         "#3D1C0E",  1, 0.55),
 ]
 # reliability = model accuracy weight for that skin tone
 # darker skin = lower reliability = model was trained on less of this data

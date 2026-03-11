@@ -29,6 +29,13 @@ except ImportError:
     print("Error: risk_engine.py not found in the current directory.")
     sys.exit(1)
 
+# Import Grad-CAM for visual explainability
+try:
+    from backend.gradcam import GradCAM, generate_heatmap_overlay
+    HAS_GRADCAM = True
+except ImportError:
+    HAS_GRADCAM = False
+
 def load_model(model_path="models/melanoma_final.pth"):
     """Loads the EfficientNet-B3 model with custom classifier."""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -81,12 +88,60 @@ def get_threshold():
                 pass
     return 0.48
 
+def show_heatmap_in_terminal(gradcam_path, prob, label, abcd):
+    try:
+        import subprocess
+        
+        print("\n------------------------------------------------------------")
+        print(" EXPLAINABILITY (Grad-CAM Heatmap Analysis)")
+        print("------------------------------------------------------------")
+        print(f" Heatmap saved -> {gradcam_path}")
+        print(f" Opening visualization automatically...")
+        subprocess.Popen(['start', '', gradcam_path], shell=True)
+        print()
+        print(" WHAT THE HEATMAP SHOWS:")
+        print("   RED   = Model focused HERE most -> suspicious region")
+        print("   YELLOW= Secondary attention -> border area")  
+        print("   BLUE  = Model ignored this -> healthy skin/background")
+        print()
+        
+        # Dynamic interpretation based on result
+        if label == "MALIGNANT":
+            print(" INTERPRETATION:")
+            print(f"   Model detected suspicious features with {prob*100:.1f}% confidence")
+            if abcd['asymmetry']['score'] > 0.5:
+                print("   -> High asymmetry detected in lesion shape")
+            if abcd['border']['score'] > 0.5:
+                print("   -> Irregular border pattern identified")
+            if abcd['color']['score'] > 0.4:
+                print("   -> Multiple color variations found")
+            if abcd['diameter']['mm'] > 6:
+                print(f"   -> Large diameter {abcd['diameter']['mm']}mm exceeds 6mm threshold")
+            print("   -> RED zone marks the most suspicious area")
+            print("   -> Immediate dermatologist consultation recommended")
+        else:
+            print(" INTERPRETATION:")
+            print(f"   Model found no strong malignant features ({prob*100:.1f}% probability)")
+            if prob > 0.35:
+                print("   -> Some features noted but below malignant threshold")
+                print("   -> RED zone shows area model examined most closely")
+                print("   -> Monitor this region in future checkups")
+            else:
+                print("   -> Lesion shows regular, uniform characteristics")
+                print("   -> No dominant suspicious region detected")
+                print("   -> Routine annual skin check recommended")
+                
+    except Exception as e:
+        print(f" Heatmap saved -> {gradcam_path}")
+
+
 def main():
     if len(sys.argv) < 2:
-        print("\n\033[93mUsage: python demo.py path/to/image.jpg\033[0m")
-        sys.exit(1)
-        
-    img_path = sys.argv[1]
+        print("MelanomaAI Terminal Demo")
+        print("=" * 40)
+        img_path = input("Enter image path: ").strip().strip('"')
+    else:
+        img_path = sys.argv[1]
     if not os.path.exists(img_path):
         print(f"\033[91mError: Image {img_path} not found.\033[0m")
         sys.exit(1)
@@ -127,6 +182,21 @@ def main():
     with torch.no_grad():
         prob = float(model(inp).squeeze().cpu().item())
     
+    # 2b. Grad-CAM heatmap generation
+    heatmap_path = None
+    if HAS_GRADCAM:
+        try:
+            cam_gen = GradCAM(model)
+            cam = cam_gen.generate(inp)
+            overlay = generate_heatmap_overlay(img_rgb, cam)
+            gradcam_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "outputs", "gradcam")
+            os.makedirs(gradcam_dir, exist_ok=True)
+            gradcam_filename = os.path.splitext(os.path.basename(img_path))[0] + "_gradcam.jpg"
+            heatmap_path = os.path.join(gradcam_dir, gradcam_filename)
+            cv2.imwrite(heatmap_path, cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
+        except Exception as e:
+            heatmap_path = None
+
     # 3. Clinical Scoring
     verdict = "MALIGNANT" if prob >= threshold else "BENIGN"
     risk_data = compute_risk_score(prob, ita, threshold)
@@ -143,7 +213,10 @@ def main():
     # Core Verdict
     colors = {"MALIGNANT": "\033[91m", "BENIGN": "\033[92m", "END": "\033[0m"}
     v_color = colors.get(verdict, "")
-    print(f"VERDICT:      {v_color}{verdict}{colors['END']}")
+    if verdict == "MALIGNANT":
+        print(f"VERDICT:      {v_color}MALIGNANT (Cancerous — Seek immediate medical attention){colors['END']}")
+    else:
+        print(f"VERDICT:      {v_color}BENIGN (Non-cancerous — Routine monitoring recommended){colors['END']}")
     print(f"Probability:  {prob*100:.1f}%")
     print(f"Risk Level:   {risk_data['level']}")
     print(f"Risk Score:   {int(risk_data['score'])}/100")
@@ -160,6 +233,15 @@ def main():
     print(f" - Color:     {abcd['color']['score']:.3f} [{abcd['color']['label']}]")
     print(f" - Diameter:  {abcd['diameter']['mm']:.1f}mm [{abcd['diameter']['label']}]")
     
+    # Grad-CAM output
+    if heatmap_path and os.path.exists(heatmap_path):
+        show_heatmap_in_terminal(heatmap_path, prob, verdict, abcd)
+    else:
+        print("-" * 60)
+        print("EXPLAINABILITY (Grad-CAM)")
+        print("-" * 60)
+        print(f"Heatmap:      Not generated (Grad-CAM unavailable)")
+
     # Global Performance
     print("-" * 60)
     print("SYSTEM PERFORMANCE (GLOBAL METRICS)")
