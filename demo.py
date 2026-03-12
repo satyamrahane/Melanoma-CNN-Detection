@@ -146,6 +146,15 @@ def main():
         print(f"\033[91mError: Image {img_path} not found.\033[0m")
         sys.exit(1)
 
+    try:
+        age_input = input("Enter patient age (or press Enter to skip): ")
+        if age_input == "":
+            age = 40
+        else:
+            age = int(age_input)
+    except Exception:
+        age = 40
+
     # 1. Initialize
     print("\n[1/3] Loading MelanomaAI Model...")
     model, device = load_model()
@@ -199,7 +208,7 @@ def main():
 
     # 3. Clinical Scoring
     verdict = "MALIGNANT" if prob >= threshold else "BENIGN"
-    risk_data = compute_risk_score(prob, ita, threshold)
+    risk_data = compute_risk_score(prob, ita, threshold, age=age)
     abcd = estimate_abcd(prob)
 
     # 4. Final Output
