@@ -6,20 +6,36 @@ Generates fairness report comparing light vs dark skin predictions
 
 import os
 import numpy as np
-import tensorflow as tf
+import torch
+import torch.nn as nn
+from torchvision import models
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import cv2
 from sklearn.metrics import roc_auc_score, f1_score, confusion_matrix
 import json
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
 from datetime import datetime
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
 IMG_SIZE = 224
 DATA_DIR = "data/processed"
-MODEL_PATH = "models/melanoma_model_improved.keras"
+MODEL_PATH = "models/melanoma_final.pth"
 OUTPUT_DIR = "outputs"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+def build_model():
+    base = models.efficientnet_b3(weights=None)
+    nf = base.classifier[1].in_features
+    base.classifier = nn.Sequential(
+        nn.Dropout(.5), nn.Linear(nf,512), nn.ReLU(),
+        nn.BatchNorm1d(512), nn.Dropout(.3), nn.Linear(512,256),
+        nn.ReLU(), nn.Dropout(.2), nn.Linear(256,1), nn.Sigmoid()
+    )
+    return base
 
 # ─── ITA SKIN TONE DETECTION ─────────────────────────────────────────────────
 def estimate_ita(image_rgb):
@@ -76,11 +92,14 @@ def apply_clahe(image_rgb):
 
 # ─── LOAD MODEL ───────────────────────────────────────────────────────────────
 def load_model():
-    for path in [MODEL_PATH, "models/melanoma_final.keras"]:
-        if os.path.exists(path):
-            print(f"✅ Loaded model: {path}")
-            return tf.keras.models.load_model(path, compile=False)
-    raise FileNotFoundError("No model found. Run train.py first.")
+    if os.path.exists(MODEL_PATH):
+        print(f"✅ Loaded model: {MODEL_PATH}")
+        model = build_model()
+        ck = torch.load(MODEL_PATH, map_location=device)
+        model.load_state_dict(ck["model_state_dict"])
+        model = model.to(device).eval()
+        return model
+    raise FileNotFoundError("No model found. Train model first.")
 
 # ─── EVALUATE ─────────────────────────────────────────────────────────────────
 def evaluate_by_skin_tone():
@@ -116,14 +135,22 @@ def evaluate_by_skin_tone():
                 group = "dark_skin" if is_dark_skin(ita) else "light_skin"
 
                 # Standard prediction
-                inp = np.expand_dims(img_resized.astype(np.float32), 0)
-                pred_std = float(model.predict(inp, verbose=0)[0][0])
+                tfm = A.Compose([
+                    A.Resize(IMG_SIZE, IMG_SIZE),
+                    A.Normalize(mean=[.485,.456,.406], std=[.229,.224,.225]),
+                    ToTensorV2()
+                ])
+                inp_t = tfm(image=img_rgb)["image"].unsqueeze(0).to(device)
+                
+                with torch.no_grad():
+                    pred_std = float(model(inp_t).item())
 
                 # Robustness prediction (CLAHE for dark skin)
                 if is_dark_skin(ita):
                     img_enhanced = apply_clahe(img_resized)
-                    inp_enh = np.expand_dims(img_enhanced.astype(np.float32), 0)
-                    pred_rob = float(model.predict(inp_enh, verbose=0)[0][0])
+                    inp_enh_t = tfm(image=img_enhanced)["image"].unsqueeze(0).to(device)
+                    with torch.no_grad():
+                        pred_rob = float(model(inp_enh_t).item())
                 else:
                     pred_rob = pred_std
 
