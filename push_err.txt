@@ -1,0 +1,8 @@
+remote: error: Trace: 85fe4cb2033b89fc9cc3139585776147abde75f8dcbed045670ead26c03f9cd2        
+remote: error: See https://gh.io/lfs for more information.        
+remote: error: File models/melanoma_model.keras is 127.86 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: File models/melanoma_model.h5 is 127.86 MB; this exceeds GitHub's file size limit of 100.00 MB        
+remote: error: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
+To https://github.com/satyamrahane/Melanoma-CNN-Detection.git
+ ! [remote rejected] main -> main (pre-receive hook declined)
+error: failed to push some refs to 'https://github.com/satyamrahane/Melanoma-CNN-Detection.git'

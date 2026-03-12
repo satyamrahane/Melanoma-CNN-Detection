@@ -1,0 +1,4 @@
+53afb9e MelanomaAI Final - 88.94% acc, AUC 0.9392, GradCAM, Risk Engine, Fairness Analysis, demo.py
+cead194 MelanomaAI Final - 88.94% accuracy, AUC 0.9392, demo.py added
+b1dec16 MelanomaAI Final - 88.94% accuracy, AUC 0.9392, demo.py added
+45e7127 MelanomaAI v3.0 - EfficientNetB3 + Risk Engine + Robustness Layer

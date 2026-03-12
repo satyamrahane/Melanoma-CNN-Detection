@@ -1,0 +1,19 @@
+On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   evaluate_robustness.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	log.txt
+	log2.txt
+	outputs/confusion_matrix.png
+	outputs/fairness_report.png
+	outputs/final_eval.log
+	outputs/final_train.log
+	outputs/roc_curve.png
+	status.txt
+	status2.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
