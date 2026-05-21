@@ -21,7 +21,8 @@ from sklearn.metrics import (
 from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from risk_engine import estimate_ita, get_skin_tone, apply_clahe, compute_risk_score, score_predictions
-DATA_DIR   = "data/processed"
+DATA_DIR   = os.environ.get("DATA_DIR", "data/processed")
+print(f"[CONFIG] DATA_DIR = {DATA_DIR}")
 MODEL_DIR  = "models"
 OUTPUT_DIR = "outputs"
 GRAPH_DIR  = os.path.join(OUTPUT_DIR, "graphs")

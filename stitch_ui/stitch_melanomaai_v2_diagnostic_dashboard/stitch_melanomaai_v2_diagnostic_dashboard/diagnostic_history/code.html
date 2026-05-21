@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MelanomaAI v2 - Session History</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#30353e",
+                        "surface-dim": "#0f141b",
+                        "on-secondary-fixed-variant": "#004e5c",
+                        "tertiary-fixed-dim": "#c3c6cf",
+                        "secondary-fixed": "#acedff",
+                        "tertiary-container": "#8d9199",
+                        "secondary": "#4cd7f6",
+                        "on-primary-container": "#00285d",
+                        "primary-container": "#4d8eff",
+                        "on-surface": "#dee2ee",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-lowest": "#090e16",
+                        "surface-bright": "#343942",
+                        "inverse-surface": "#dee2ee",
+                        "primary": "#adc6ff",
+                        "on-background": "#dee2ee",
+                        "inverse-on-surface": "#2c3139",
+                        "secondary-container": "#03b5d3",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-tertiary": "#2d3137",
+                        "background": "#0f141b",
+                        "surface-container-highest": "#30353e",
+                        "error-container": "#93000a",
+                        "on-primary-fixed": "#001a42",
+                        "inverse-primary": "#005ac2",
+                        "outline": "#8c909f",
+                        "surface": "#0f141b",
+                        "tertiary-fixed": "#dfe2eb",
+                        "on-tertiary-fixed-variant": "#43474e",
+                        "on-primary": "#002e6a",
+                        "primary-fixed": "#d8e2ff",
+                        "on-secondary-container": "#00424e",
+                        "error": "#ffb4ab",
+                        "tertiary": "#c3c6cf",
+                        "surface-container-low": "#171c24",
+                        "on-tertiary-container": "#262a31",
+                        "surface-container-high": "#252a33",
+                        "on-secondary-fixed": "#001f26",
+                        "surface-tint": "#adc6ff",
+                        "surface-container": "#1b2028",
+                        "on-tertiary-fixed": "#181c22",
+                        "on-surface-variant": "#c2c6d6",
+                        "on-secondary": "#003640",
+                        "outline-variant": "#424754",
+                        "on-primary-fixed-variant": "#004395",
+                        "secondary-fixed-dim": "#4cd7f6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "12px",
+                        "unit": "8px",
+                        "stack-md": "24px",
+                        "gutter": "24px",
+                        "container-padding-mobile": "20px",
+                        "container-padding-desktop": "40px",
+                        "stack-lg": "48px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Geist"],
+                        "label-md": ["Geist"],
+                        "label-sm": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "headline-lg-mobile": ["Geist"],
+                        "headline-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Glassmorphism & custom utility overrides based on guidance */
+        .glass-panel {
+            background-color: rgba(18, 23, 31, 0.6); /* 60% of surface */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .micro-border {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .micro-border-active {
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        .inner-glow {
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        .ai-pulse {
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(76, 215, 246, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 215, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 215, 246, 0); }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen w-full overflow-hidden flex selection:bg-secondary selection:text-on-secondary">
+<!-- SideNavBar (Desktop Only) -->
+<nav class="hidden md:flex flex-col h-full py-stack-md bg-surface-dim/60 backdrop-blur-2xl docked left-0 h-screen w-64 border-r border-white/10 shrink-0">
+<!-- Header -->
+<div class="px-gutter mb-stack-md flex items-center gap-unit">
+<div class="w-10 h-10 rounded-lg bg-surface flex items-center justify-center micro-border inner-glow">
+<img alt="MelanomaAI Logo" class="w-6 h-6 object-cover rounded" data-alt="A macro, abstract geometric digital illustration representing artificial intelligence in medicine. Deep neon blue and crisp white vectors intersecting. High-tech modern minimal style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSD_f4MxVLRmfZNZ0MVb77TcqozUdr2O1wMyfreMJPIHCSPBrw6ZLBpaB8rGX33BXzmyiB44mjQ9REhJElxJWxdNYDnOtC47fFuZ5FGNtfMSPZKA7sxBGGdicUpXg2Wj3unRtbOFhA9ARBYdo9tgkJF5j18QR1C_bEMRXjUwWT-y5o5_NWNJHQW_hysyKo6hYe7KkIB_VIcaoP7tuwjzHp22ysg3-S5vhVnuqXByPFVOjbm10N8btpnGwamq0dG1sFYUgMKgbmDDc"/>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-extrabold text-primary">MelanomaAI</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">v2.0.4 Enterprise</p>
+</div>
+</div>
+<!-- Main Tabs -->
+<div class="flex-1 px-unit space-y-1">
+<a class="flex items-center gap-stack-sm px-unit py-unit rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 300;">dashboard</span>
+<span class="font-label-md text-label-md">Workspace</span>
+</a>
+<a class="flex items-center gap-stack-sm px-unit py-unit rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 300;">monitoring</span>
+<span class="font-label-md text-label-md">Model Performance</span>
+</a>
+<a class="flex items-center gap-stack-sm px-unit py-unit rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 300;">balance</span>
+<span class="font-label-md text-label-md">Fairness &amp; Robustness</span>
+</a>
+<!-- Active Tab -->
+<a class="flex items-center gap-stack-sm px-unit py-unit rounded-lg bg-secondary/10 text-secondary border-r-2 border-secondary font-bold transition-all duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 500, 'FILL' 1;">history</span>
+<span class="font-label-md text-label-md">Session History</span>
+</a>
+</div>
+<!-- CTA & Footer Tabs -->
+<div class="px-gutter mt-auto space-y-stack-sm">
+<button class="w-full py-unit px-stack-sm bg-primary-container text-on-primary-container rounded-lg font-label-md text-label-md flex items-center justify-center gap-unit hover:bg-primary-container/90 transition-colors inner-glow">
+<span class="material-symbols-outlined">add</span>
+                New Diagnostic
+            </button>
+<div class="pt-stack-sm border-t border-white/5 space-y-1">
+<a class="flex items-center gap-stack-sm px-unit py-unit rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 300;">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-stack-sm px-unit py-unit rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 300;">help_outline</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<!-- TopAppBar (Mobile & Desktop) -->
+<header class="flex justify-between items-center w-full px-gutter h-16 bg-surface/60 backdrop-blur-xl docked full-width top-0 z-50 border-b border-white/5 shrink-0">
+<!-- Mobile Menu Toggle -->
+<div class="md:hidden flex items-center">
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<!-- Brand (Mobile focus) -->
+<div class="md:hidden flex-1 flex justify-center">
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tighter text-on-surface">MelanomaAI v2</span>
+</div>
+<!-- Search Bar (Left aligned on Desktop) -->
+<div class="hidden md:flex items-center relative w-64">
+<span class="material-symbols-outlined absolute left-3 text-outline">search</span>
+<input class="w-full bg-surface-container-highest border border-white/5 rounded-lg py-1.5 pl-10 pr-3 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-secondary/50 focus:ring-1 focus:ring-secondary/50 transition-all" placeholder="Search histories..." type="text"/>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-stack-sm">
+<div class="hidden md:flex items-center gap-unit text-on-surface-variant">
+<button class="p-1 rounded-full hover:bg-surface-variant/30 transition-all duration-300 hover:scale-95"><span class="material-symbols-outlined">memory</span></button>
+<button class="p-1 rounded-full hover:bg-surface-variant/30 transition-all duration-300 hover:scale-95"><span class="material-symbols-outlined">analytics</span></button>
+<button class="p-1 rounded-full hover:bg-surface-variant/30 transition-all duration-300 hover:scale-95"><span class="material-symbols-outlined">notifications</span></button>
+</div>
+<button class="hidden md:flex items-center gap-unit px-stack-sm py-1.5 bg-secondary text-on-secondary rounded-full font-label-sm text-label-sm hover:shadow-[0_0_15px_rgba(76,215,246,0.4)] transition-all">
+                    Run Analysis
+                </button>
+<img alt="Chief Pathologist Profile" class="w-8 h-8 rounded-full border border-white/10 object-cover" data-alt="A professional headshot of a female doctor wearing modern blue scrubs in a softly lit clinical environment. The lighting is clean and professional, conveying expertise and trust. Dark cinematic background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC16Q1Hir928FZM-K8BiT8qCmXV6EFbo36Dy4T-SZ9rpZehfWjzaNutgwspZY5hUyD9nD24Fm7jL_HDXAyrpD3wYh0s4tea3QE55QBczb06I_UBLP3YdFzVadc8EvhFPDTeBK1cIOmeVwl8RoXRCNQLXOiM0tD_gzH46aIvXoYr6t17F_CMdLhZiGnNzairZHisWDX_SYB037L2J572Km4Mub-nUbiu1kc3W8G_tiM7fQmr2ZT7JDAQcWjwSmZe1UN29S61wyk5j4o"/>
+</div>
+</header>
+<!-- Canvas -->
+<div class="flex-1 overflow-y-auto p-container-padding-mobile md:p-container-padding-desktop">
+<div class="max-w-7xl mx-auto space-y-stack-lg">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-stack-md">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface mb-unit">Session History</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Review and export clinical records from the current diagnostic session.</p>
+</div>
+<!-- Filters & Search (Mobile/Secondary) -->
+<div class="flex items-center gap-unit">
+<div class="relative w-full md:w-auto">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">filter_list</span>
+<select class="bg-surface-container-high border border-white/10 rounded-lg py-2 pl-10 pr-8 font-label-md text-label-md text-on-surface appearance-none focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all w-full md:w-48">
+<option>All Outcomes</option>
+<option>Malignant</option>
+<option>Benign</option>
+<option>Inconclusive</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-outline text-[20px] pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid Layout for Records -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- High Priority/Recent Card (Spans more cols) -->
+<div class="lg:col-span-8 glass-panel rounded-xl micro-border inner-glow flex flex-col overflow-hidden relative group">
+<!-- Header -->
+<div class="px-stack-md py-stack-sm border-b border-white/5 flex justify-between items-center bg-surface-container-low/50">
+<div class="flex items-center gap-unit">
+<span class="w-2 h-2 rounded-full bg-error ai-pulse"></span>
+<span class="font-label-md text-label-md text-on-surface">Case ID: MEL-2023-8891</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Today, 14:32</span>
+</div>
+<!-- Content -->
+<div class="p-stack-md flex flex-col sm:flex-row gap-stack-md flex-1">
+<!-- Image -->
+<div class="w-full sm:w-48 h-48 rounded-lg overflow-hidden shrink-0 micro-border relative">
+<img alt="Lesion scan" class="w-full h-full object-cover" data-alt="A highly detailed, extreme macro medical photograph of human skin displaying a mole. The lighting is clinical and uniform, utilizing dermoscopy techniques. The colors are natural flesh tones with deep pigmentation. Clinical, analytical aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZBgoWq3YNXPZpLdm8rrCTD07_bu6T5ra8v9yDIwilw8BIQziy4qCTsOt3ReXcZQR3huaGLJEMyA9LTCPrmy-d3-i7uTnjQ__2PWpBKT9U2d8CjWtPfTA_SH1s_pgIvcwcKP59-DwelLIU35pqSdkkO_dLL03HREjGJS04egw7BAf8uhrw7KG8go0xIQHTGdcRAzJrNQNdXn0aSGurPB8MzBra0mKeb51BZaPQscQ1slRvBAIsWj9JwhzhzVC5EYYvrQJtRGBnbl4"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-dim/80 to-transparent"></div>
+<div class="absolute bottom-2 left-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-[16px]">center_focus_strong</span>
+<span class="font-label-sm text-label-sm text-on-surface">Zoom 40x</span>
+</div>
+</div>
+<!-- Details -->
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-unit mb-stack-sm">
+<span class="px-2 py-1 rounded bg-error text-on-error-container font-label-sm text-label-sm uppercase tracking-wider">Malignant</span>
+<span class="font-headline-md text-headline-md text-on-surface ml-auto">98.4%</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Confidence</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-unit">
+                                        AI analysis detected significant asymmetry and border irregularity. High probability of superficial spreading melanoma. Immediate biopsy recommended.
+                                    </p>
+<div class="grid grid-cols-2 gap-stack-sm mt-stack-sm border-t border-white/5 pt-stack-sm">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Asymmetry Score</span>
+<span class="font-body-md text-body-md text-on-surface">8.2 / 10</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Color Variance</span>
+<span class="font-body-md text-body-md text-on-surface">High (3 tones)</span>
+</div>
+</div>
+</div>
+<!-- Action -->
+<div class="mt-stack-md flex justify-end">
+<button class="px-stack-md py-2 rounded-lg border border-white/10 hover:border-secondary/50 text-secondary font-label-md text-label-md flex items-center gap-unit transition-all hover:bg-secondary/5 inner-glow">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                                        Export Report
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Secondary Card -->
+<div class="lg:col-span-4 glass-panel rounded-xl micro-border inner-glow flex flex-col overflow-hidden">
+<!-- Header -->
+<div class="px-stack-sm py-stack-sm border-b border-white/5 flex justify-between items-center bg-surface-container-low/50">
+<span class="font-label-md text-label-md text-on-surface">MEL-2023-8890</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Today, 11:15</span>
+</div>
+<div class="p-stack-sm flex flex-col gap-stack-sm flex-1">
+<div class="h-32 rounded-lg overflow-hidden micro-border w-full relative">
+<img alt="Lesion scan" class="w-full h-full object-cover grayscale opacity-80" data-alt="A close-up dermatoscope image of a completely benign, circular skin mole. Uniform brown color, perfectly round borders. The lighting is bright and scientific. The overall tone is calm and diagnostic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB69ZlblRMlNwJXtDMstfsdYKGQd_PGORRyF7zze_-TXIOhaFRV_vm-j8Ip_rmI1vLoYPFaDdSy8xtmWB6YMZ-IgkjRIYzVviDT7Z6bVPce2_X_XeUqBKHx24YySCgGYq1MnlW6wOpWqWLWgOoz824MH-SITGXsXYzliJWvTmn9CbH7IY_0bFjCiewvroSYAnmgKNDQOZuJRkDZqXSAHa9Tw8rzjjFvErB7MbBq7mLDSgAPKKI1njrbyR-42aCLhFTKWyz7IMGv5t8"/>
+<div class="absolute top-2 right-2 px-2 py-0.5 rounded bg-surface-variant/80 backdrop-blur text-on-surface font-label-sm text-label-sm border border-white/10">Benign</div>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<div>
+<span class="font-headline-md text-headline-md text-on-surface">99.1%</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Confidence</span>
+</div>
+<button class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-secondary hover:bg-secondary/10 transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Standard List Items (Grid) -->
+<div class="lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- List Item 1 -->
+<div class="glass-panel rounded-xl micro-border p-stack-sm flex gap-stack-sm items-center hover:bg-surface-container-high/40 transition-colors group">
+<img alt="Thumb" class="w-16 h-16 rounded object-cover micro-border opacity-70 group-hover:opacity-100 transition-opacity" data-alt="A small thumbnail image showing a patch of human skin with a slight redness. Clinical photography style, harsh flash lighting, scientific context. Muted colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfoGA-zLh89-01a6JoepDvot6vUyfXkw3274mGWy_C7_2yP7BGQonhjWEmGlhWk4dST2ohKkmQAZNl1_6E4XJXCWSQfOrKYssSzWzdk1vOYSWWhIoLZfPqHTQL_vG7m7aV8Bm8XnyIWRYwdBepoISZ0gIkJQakK3nUy2GH5n6WuFcw-u2HG7l6_KIEfwz3tEdh3z8Cr8gIu0PsFT0Yyec2VkKqLnoVMLQ3LuHeQzwaHGJiRbbIA_fl4VPtqhBZKHIz6qlRQux7jHc"/>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<span class="font-label-md text-label-md text-on-surface">MEL-8889</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Yesterday</span>
+</div>
+<div class="flex items-center gap-unit">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-on-surface">Benign (87%)</span>
+</div>
+</div>
+<button class="opacity-0 group-hover:opacity-100 text-secondary p-1 rounded hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+</div>
+<!-- List Item 2 -->
+<div class="glass-panel rounded-xl micro-border p-stack-sm flex gap-stack-sm items-center hover:bg-surface-container-high/40 transition-colors group">
+<img alt="Thumb" class="w-16 h-16 rounded object-cover micro-border opacity-70 group-hover:opacity-100 transition-opacity" data-alt="Microscopic view of cellular structures, abstract medical imaging. Deep purples and pinks typical of H&amp;E staining in pathology. Scientific, detailed, high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl3yNsyOmxVIFjAVDbs1fDthPEWEZVEWYWNNinlGe1zpzNcLtIMkwZa5JjO6l1MKdPnu0MeelV5hDs5I7_w_K1sd_zjsQmY2LEz1j_vn_yPViE8M3x60aWGXqxbyolsC0A3L6-mmbZTeiwa8a9B_RlaVFCtNtARHxANIPcP7u6W38btlw7_w__c9oHLSp-AAAQybE47BRSgtWNMlB2mGgdfdNgiMo7gPyvYFE44Xzajlr03H6F_eBXHQSjdL6AlGrt2P6FEVKp_VY"/>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<span class="font-label-md text-label-md text-on-surface">MEL-8888</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Oct 24</span>
+</div>
+<div class="flex items-center gap-unit">
+<span class="w-2 h-2 rounded-full bg-tertiary-container"></span>
+<span class="font-label-sm text-label-sm text-on-surface">Inconclusive (51%)</span>
+</div>
+</div>
+<button class="opacity-0 group-hover:opacity-100 text-secondary p-1 rounded hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+</div>
+<!-- List Item 3 -->
+<div class="glass-panel rounded-xl micro-border p-stack-sm flex gap-stack-sm items-center hover:bg-surface-container-high/40 transition-colors group">
+<div class="w-16 h-16 rounded bg-surface-variant flex items-center justify-center micro-border">
+<span class="material-symbols-outlined text-outline">image_not_supported</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<span class="font-label-md text-label-md text-on-surface">MEL-8887</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Oct 22</span>
+</div>
+<div class="flex items-center gap-unit">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="font-label-sm text-label-sm text-on-surface">Malignant (92%)</span>
+</div>
+</div>
+<button class="opacity-0 group-hover:opacity-100 text-secondary p-1 rounded hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

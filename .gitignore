@@ -1,32 +1,66 @@
-# Model files (too large for GitHub)
-models/*.pth
-models/*.pt
-models/*.h5
-models/*.keras
+# ── Data & trained weights (never upload) ─────────────────────────────────────
+data/
+models/
+*.pth
+*.pt
+*.ckpt
+*.h5
+*.keras
+*.onnx
 
-# Python cache
+# ── Python / virtual env ──────────────────────────────────────────────────────
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-
-# Data (too large for GitHub)
-data/
-
-# Outputs (generated files)
-outputs/graphs/
-outputs/*.json
-
-# Virtual environment
 venv/
 env/
 .env
 
-# IDE
+# ── Logs & temp ───────────────────────────────────────────────────────────────
+*.log
+*.tmp
+training.log
+balance_log.txt
+streamlit_*.log
+log.txt
+log2.txt
+
+# ── Caches & checkpoints ──────────────────────────────────────────────────────
+.ipynb_checkpoints/
+.pytest_cache/
+.cache/
+
+# ── Outputs: generated / local-only ─────────────────────────────────────────
+outputs/graphs/
+outputs/reports/
+outputs/*_temp.txt
+outputs/demo_*.txt
+outputs/table_utf8.txt
+outputs/threshold_table_temp.txt
+outputs/temp.txt
+
+# JSON metrics (ignore all, then allow submission artifacts)
+outputs/*.json
+!outputs/metrics.json
+!outputs/robustness_report.json
+!outputs/fairness_metrics.json
+!outputs/risk_analysis.json
+
+# ── Backups & local artifacts ─────────────────────────────────────────────────
+backups/
+report_*.pdf
+
+# Shell/agent debug artifacts
+*_out.txt
+push_err*.txt
+pre_commit_status.txt
+status*.txt
+package_check.py
+
+# ── IDE / OS ──────────────────────────────────────────────────────────────────
 .vscode/
 *.suo
 *.user
-
-# OS
 .DS_Store
 Thumbs.db

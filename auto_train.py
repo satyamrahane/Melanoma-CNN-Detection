@@ -35,13 +35,19 @@ if torch.cuda.is_available():
 print(f"  Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 print("="*60)
 
-IMG_SIZE   = 224
+MAX_SAMPLES = int(os.environ.get("MAX_SAMPLES", 0))
+IMG_SIZE   = 384
 BATCH_SIZE = 16
-EPOCHS_P1  = 20
-EPOCHS_P2  = 50
+EPOCHS_P1  = 5
+EPOCHS_P2  = 15
 LR_P1      = 1e-4
 LR_P2      = 1e-5
-DATA_DIR   = "data/processed"
+DATA_DIR   = os.environ.get("DATA_DIR", "data/v2/balanced")
+print(f"[CONFIG] DATA_DIR = {DATA_DIR}")
+print(f"[CONFIG] MAX_SAMPLES = {MAX_SAMPLES if MAX_SAMPLES > 0 else 'disabled'}")
+RESUME_CKPT = os.environ.get("RESUME_CKPT", "")
+if RESUME_CKPT:
+    print(f"[CONFIG] RESUME_CKPT = {RESUME_CKPT}")
 
 train_transform = A.Compose([
     A.Resize(IMG_SIZE, IMG_SIZE),
@@ -120,22 +126,26 @@ print("\n[DATA] Loading data...")
 base_ds = ImageFolder(DATA_DIR)
 class_names = base_ds.classes
 n = len(base_ds)
-val_size = int(0.2 * n)
-train_size = n - val_size
 torch.manual_seed(42)
 perm = torch.randperm(n).tolist()
+if MAX_SAMPLES > 0 and MAX_SAMPLES < n:
+    perm = perm[:MAX_SAMPLES]
+    print(f"   Stage 1 limit active: using {MAX_SAMPLES} of {n} samples")
+n = len(perm)
+val_size = int(0.2 * n)
+train_size = n - val_size
 train_idx = perm[:train_size]
 val_idx   = perm[train_size:]
 train_ds = SkinDataset(DATA_DIR, transform=train_transform, indices=train_idx)
 val_ds   = SkinDataset(DATA_DIR, transform=val_transform,   indices=val_idx)
 benign_count    = len(os.listdir(f"{DATA_DIR}/benign"))
 malignant_count = len(os.listdir(f"{DATA_DIR}/malignant"))
-print(f"   Benign: {benign_count}  Malignant: {malignant_count}  Total: {n}")
+print(f"   Benign: {benign_count}  Malignant: {malignant_count}  Total used: {n}")
 print(f"   Train: {train_size}  Val: {val_size}")
-all_labels = [base_ds.samples[i][1] for i in range(n)]
-weights = compute_class_weight("balanced", classes=np.unique(all_labels), y=all_labels)
+selected_labels = [base_ds.samples[i][1] for i in perm]
+weights = compute_class_weight("balanced", classes=np.unique(selected_labels), y=selected_labels)
 print(f"   Class weights — benign:{weights[0]:.2f} malignant:{weights[1]:.2f}")
-train_labels = [all_labels[i] for i in train_idx]
+train_labels = selected_labels[:train_size]
 sample_weights = [weights[l] for l in train_labels]
 sampler = WeightedRandomSampler(sample_weights, len(sample_weights), replacement=True)
 train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, sampler=sampler,
@@ -159,6 +169,20 @@ base_model.classifier = nn.Sequential(
     nn.Sigmoid()
 )
 model = base_model.to(device)
+if RESUME_CKPT:
+    try:
+        if os.path.exists(RESUME_CKPT):
+            print(f"  Loading checkpoint weights from {RESUME_CKPT}")
+            ck = torch.load(RESUME_CKPT, map_location=device)
+            if isinstance(ck, dict) and "model_state_dict" in ck:
+                model.load_state_dict(ck["model_state_dict"])
+                print("  ✅ Checkpoint weights loaded into model (resume).")
+            else:
+                # allow loading plain state_dict
+                model.load_state_dict(ck)
+                print("  ✅ Checkpoint state_dict loaded into model (resume).")
+    except Exception as e:
+        print(f"  ⚠ Failed to load resume checkpoint: {e}")
 print(f"   Parameters: {sum(p.numel() for p in model.parameters()):,}")
 
 class FocalLoss(nn.Module):
@@ -324,7 +348,7 @@ def train_phase(model, loader, val_loader, optimizer, scheduler,
         print(f"  ETA finish:    {eta_phase.strftime('%H:%M:%S')}{marker}")
         print(f"  {'─'*55}\n")
 
-        if wait >= patience:
+        if patience is not None and wait >= patience:
             print(f"  ⏹ Early stopping at epoch {epoch}")
             break
 

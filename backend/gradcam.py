@@ -12,9 +12,12 @@ Reference: Selvaraju et al. "Grad-CAM: Visual Explanations from Deep Networks
 via Gradient-based Localization" (ICCV 2017)
 """
 
+import os
 import cv2
 import numpy as np
 import torch
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
 
 
 class GradCAM:
@@ -116,3 +119,37 @@ def generate_heatmap_overlay(
     # Blend
     overlay = np.uint8(original_img * (1 - alpha) + heatmap_rgb * alpha)
     return overlay
+
+
+def generate_gradcam(image_path, output_path=None, alpha=0.45):
+    """Generate and save a Grad-CAM overlay image for a single dermoscopy image."""
+    if not os.path.exists(image_path):
+        return None
+
+    from backend.model import load_model
+
+    model, _ = load_model()
+    if model is None:
+        raise FileNotFoundError('Model checkpoint not found. Ensure models/melanoma_final.pth exists.')
+
+    image = cv2.imread(image_path)
+    if image is None:
+        return None
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    preprocess = A.Compose([
+        A.Resize(224, 224),
+        A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ToTensorV2()
+    ])
+
+    tensor = preprocess(image=image)["image"].unsqueeze(0).to(next(model.parameters()).device)
+    cam = GradCAM(model).generate(tensor)
+    overlay = generate_heatmap_overlay(image, cam, alpha=alpha)
+
+    if output_path is None:
+        root, _ = os.path.splitext(image_path)
+        output_path = f"{root}_gradcam.png"
+
+    cv2.imwrite(output_path, cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
+    return output_path

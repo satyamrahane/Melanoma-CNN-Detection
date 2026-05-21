@@ -1,0 +1,12 @@
+{
+  "threshold": 0.45,
+  "level_counts": {
+    "CRITICAL": 1,
+    "HIGH": 28,
+    "MODERATE": 166,
+    "LOW": 1369
+  },
+  "mean_score": 19.29085677749361,
+  "fp_caught": 134,
+  "fp_catch_rate": 0.8220858895705522
+}

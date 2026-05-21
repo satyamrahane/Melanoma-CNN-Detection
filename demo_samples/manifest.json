@@ -1,0 +1,23 @@
+{
+  "description": "Curated viva demo images — copy into Workspace via quick-load buttons",
+  "samples": {
+    "benign": {
+      "file": "benign_ISIC_0024322.jpg",
+      "title": "Benign (light skin)",
+      "expected": "Low malignancy probability · standard preprocessing",
+      "source": "HAM10000 processed test set"
+    },
+    "malignant": {
+      "file": "malignant_ISIC_0024310.jpg",
+      "title": "Malignant (dark skin + CLAHE)",
+      "expected": "High malignancy probability · CLAHE auto-applied (ITA ≤ 28°)",
+      "source": "HAM10000 processed test set"
+    },
+    "dark_skin": {
+      "file": "dark_skin_ISIC_0024313.jpg",
+      "title": "Dark skin fairness demo",
+      "expected": "CLAHE routing on dark skin · fairness preprocessing visible",
+      "source": "HAM10000 processed test set"
+    }
+  }
+}
